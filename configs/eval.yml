@@ -1,7 +1,10 @@
-db:
-  mssql_creds: "mssql-creds.yml"
-  data_table: "Wines"
-  metrics_table: "Metrics"
+#db:
+#  mssql_creds: "mssql-creds.yml"
+#  data_table: "Wines"
+#  metrics_table: "Metrics"
+
+test_data: "data/test.csv"
 
 model: "experiments/latest/model.sklrn"
 ansible_pwd: "ansible-pwd.txt"
+kafka_creds: "kafka-creds.yml"

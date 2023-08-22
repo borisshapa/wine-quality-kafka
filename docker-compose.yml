@@ -2,27 +2,59 @@ version: "3.10"
 services:
   web:
     build: .
-    command: ./sh_scripts/wait_for_it.sh -t 40 mssql:1433 -- 
-         bash -c "python -m scripts.train --config_path=configs/db.yml && 
-         python -m scripts.eval --config_path=configs/eval.yml && 
-         coverage run -m src.unit_tests.test_preprocess && 
-         coverage run -a -m src.unit_tests.test_dao &&
-         coverage report -m &&
+    command: ./sh_scripts/wait_for_it.sh mssql:1433 -t 120 --
+         bash -c "python -m scripts.init_db --config_path=configs/init.yml && \
+         python -m scripts.train --config_path=configs/train.yml && \
+         python -m scripts.eval --config_path=configs/eval.yml && \
+         python -m scripts.clear_db --config_path=configs/clear.yml && \
+         coverage run -m src.unit_tests.test_preprocess && \
+         coverage run -a -m src.unit_tests.test_dao && \
+         coverage report -m
          rm ansible-pwd.txt"
     ports:
       - 8000:8000
     image: borisshapa/wine-quality:latest
-    volumes:
-      - ./scripts:/app/scripts
-      - ./src:/app/src
-      - ./configs:/app/configs
     depends_on:
       - mssql
+
   mssql:
-    build:
-      dockerfile: mssql.dockerfile
-      context: .
+    image: mcr.microsoft.com/mssql/server
     ports:
       - "1433:1433"
-    volumes:
-      - ./data:/data
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_PWD}
+      - USER_ID=${MSSQL_UID}
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    expose:
+      - "29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    restart: always
+
+  kafka_init:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - kafka
+    command: bash -c "cub kafka-ready -b kafka:29092 1 20 && \
+          kafka-topics --bootstrap-server=kafka:29092 \
+          --create --if-not-exists --topic wine-quality \
+          --replication-factor 1 --partitions 1"

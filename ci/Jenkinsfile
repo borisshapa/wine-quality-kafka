@@ -23,7 +23,7 @@ pipeline {
         stage("Clone github repository") {
             steps {
                 cleanWs()
-                sh "git clone -b $GIT_BRANCH https://${GITHUB_ACCESS_TOKEN}@github.com/borisshapa/wine-quality-secrets"
+                sh "git clone -b $GIT_BRANCH https://${GITHUB_ACCESS_TOKEN}@github.com/borisshapa/wine-quality-kafka"
             }
         }
         stage("Login") {
@@ -33,7 +33,7 @@ pipeline {
         }
         stage("Build and run docker container") {
             steps {
-                dir("wine-quality-secrets") {
+                dir("wine-quality-kafka") {
                     script{
                         try {
                             sh "docker compose build --build-arg ANSIBLE_PWD=${ANSIBLE_PWD} --build-arg MSSQL_SERVER=${MSSQL_SERVER} --build-arg MSSQL_UID=${MSSQL_UID} --build-arg MSSQL_PWD=${MSSQL_PWD} --build-arg MSSQL_DATABASE=${MSSQL_DATABASE}"
@@ -46,7 +46,7 @@ pipeline {
         }
         stage("Checkout coverage report") {
             steps {
-                dir("wine-quality-secrets") {
+                dir("wine-quality-kafka") {
                     script {
                         sh "docker compose logs -t --tail 10 web"
                         try {
@@ -54,7 +54,7 @@ pipeline {
                                 sh "docker compose up -d"
                                 waitUntil {
                                     "exited" == sh(returnStdout: true,
-                                    script: "docker inspect wine-quality-secrets-web-1 --format=\"{{ .State.Status }}\"").trim()
+                                    script: "docker inspect wine-quality-kafka-web-1 --format=\"{{ .State.Status }}\"").trim()
                                 }
                             }
                         } finally {

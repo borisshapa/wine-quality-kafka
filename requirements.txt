@@ -12,3 +12,4 @@ ujson~=5.7.0
 pyrallis~=0.3.1
 ansible-vault~=2.1.0
 pyodbc~=4.0.39
+kafka-python~=2.0.2

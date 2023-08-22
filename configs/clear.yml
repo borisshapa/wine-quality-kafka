@@ -1,0 +1,5 @@
+ansible_pwd: "ansible-pwd.txt"
+db:
+  mssql_creds: "mssql-creds.yml"
+  data_table: "Wines"
+  metrics_table: "Metrics"

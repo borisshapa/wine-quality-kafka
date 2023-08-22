@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from src import dao, secrets
+from src.utils import dao, secrets
 
 
 class TestDao(unittest.TestCase):
@@ -35,7 +35,7 @@ class TestDao(unittest.TestCase):
             table_name, condition={"data group": "'new data group'"}
         )
 
-        self.sql.delete_row(table_name, {"data group": "'new data group'"})
+        self.sql.delete(table_name, {"data group": "'new data group'"})
         empty_x, empty_y = self.sql.get_data(
             table_name, condition={"data group": "'new data group'"}
         )
@@ -60,7 +60,7 @@ class TestDao(unittest.TestCase):
         rows = list(df.itertuples(index=False, name=None))
         first_row = rows[0]
 
-        self.sql.delete_row(table_name, {"modelId": model_id})
+        self.sql.delete(table_name, {"modelId": model_id})
         empty_df = self.sql.get_data("Metrics", condition={"modelId": model_id})
 
         self.assertEqual(len(rows), 1)
