@@ -4,7 +4,7 @@ import os.path
 import loguru
 import numpy as np
 
-from src import utils
+from src.utils import common
 
 
 def _configure_argparser() -> argparse.ArgumentParser:
@@ -38,14 +38,14 @@ def _configure_argparser() -> argparse.ArgumentParser:
 
 
 def main(data: list[str], val_ratio: float, test_ratio: float, seed: int):
-    utils.set_deterministic_mode(seed)
+    common.set_deterministic_mode(seed)
 
     _x, _y, header = [], [], []
 
     for ind, filename in enumerate(data):
         loguru.logger.info("Reading file {} | wine type: {}", filename, ind)
 
-        x, y, header = utils.load_data_from_csv(filename, sep=utils.CSV_SEPARATOR)
+        x, y, header = common.load_data_from_csv(filename, sep=common.CSV_SEPARATOR)
         type_column = np.repeat(np.float32(ind), len(y))
         _x.append(np.column_stack((type_column, x)))
         _y.append(y)
@@ -53,7 +53,7 @@ def main(data: list[str], val_ratio: float, test_ratio: float, seed: int):
     header = ["wine type"] + header
     x, y = np.concatenate(_x), np.concatenate(_y)
 
-    partition = utils.split_into_train_val_test(x, y, val_ratio, test_ratio)
+    partition = common.split_into_train_val_test(x, y, val_ratio, test_ratio)
 
     dirname = os.path.dirname(data[-1])
     for group_name, (x, y) in partition.items():
@@ -64,7 +64,7 @@ def main(data: list[str], val_ratio: float, test_ratio: float, seed: int):
             filename,
             len(y),
         )
-        utils.save_csv(header, x, y, filename, utils.CSV_SEPARATOR)
+        common.save_csv(header, x, y, filename, common.CSV_SEPARATOR)
 
 
 if __name__ == "__main__":

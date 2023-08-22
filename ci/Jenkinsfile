@@ -3,6 +3,12 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDS=credentials("borisshapa-dockerhub")
+        GITHUB_ACCESS_TOKEN=credentials("borisshapa-docker-access-token")
+        ANSIBLE_PWD=credentials("ansible-pwd")
+        MSSQL_SERVER=credentials("mssql-server")
+        MSSQL_UID=credentials("mssql-uid")
+        MSSQL_PWD=credentials("mssql-pwd")
+        MSSQL_DATABASE=credentials("mssql-database")
         LC_ALL = "en_US.UTF-8"
         LANG = "en_US.UTF-8"
         LANGUAGE = "en_US.UTF-8"
@@ -17,7 +23,7 @@ pipeline {
         stage("Clone github repository") {
             steps {
                 cleanWs()
-                sh "git clone -b $GIT_BRANCH https://github.com/borisshapa/wine-quality"
+                sh "git clone -b $GIT_BRANCH https://${GITHUB_ACCESS_TOKEN}@github.com/borisshapa/wine-quality-kafka"
             }
         }
         stage("Login") {
@@ -27,10 +33,10 @@ pipeline {
         }
         stage("Build and run docker container") {
             steps {
-                dir("wine-quality") {
+                dir("wine-quality-kafka") {
                     script{
                         try {
-                            sh "docker compose build"
+                            sh "docker compose build --build-arg ANSIBLE_PWD=${ANSIBLE_PWD} --build-arg MSSQL_SERVER=${MSSQL_SERVER} --build-arg MSSQL_UID=${MSSQL_UID} --build-arg MSSQL_PWD=${MSSQL_PWD} --build-arg MSSQL_DATABASE=${MSSQL_DATABASE}"
                         } finally {
                             sh "docker compose up -d"
                         }
@@ -40,7 +46,7 @@ pipeline {
         }
         stage("Checkout coverage report") {
             steps {
-                dir("wine-quality") {
+                dir("wine-quality-kafka") {
                     script {
                         sh "docker compose logs -t --tail 10 web"
                         try {
@@ -48,7 +54,7 @@ pipeline {
                                 sh "docker compose up -d"
                                 waitUntil {
                                     "exited" == sh(returnStdout: true,
-                                    script: "docker inspect wine-quality-web-1 --format=\"{{ .State.Status }}\"").trim()
+                                    script: "docker inspect wine-quality-kafka-web-1 --format=\"{{ .State.Status }}\"").trim()
                                 }
                             }
                         } finally {

@@ -3,7 +3,6 @@ seed: 21
 data:
   train_data: data/train.csv
   val_data: data/val.csv
-  cat_features_indices: [0]
 
 model:
   n_estimators: 100
