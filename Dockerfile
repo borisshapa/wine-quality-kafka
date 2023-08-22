@@ -12,11 +12,9 @@ ARG KAFKA_SERVER="kafka:29092"
 RUN pip install --upgrade pip
 
 WORKDIR /app
-#ADD . /app
-COPY sh_scripts /app/sh_scripts
-COPY requirements.txt /app
+ADD . /app
 
-RUN chmod +x sh_scripts/wait_for_it.sh sh_scripts/install_odbc_debian.sh  sh_scripts/import_data.sh
+RUN chmod +x sh_scripts/wait_for_it.sh sh_scripts/install_odbc_debian.sh
 RUN ./sh_scripts/install_odbc_debian.sh
 
 RUN printf "server: \"$MSSQL_SERVER\"\nuid: \"$MSSQL_UID\"\npwd: \"$MSSQL_PWD\" \
