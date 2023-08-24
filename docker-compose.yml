@@ -21,6 +21,10 @@ services:
     image: mcr.microsoft.com/mssql/server
     ports:
       - "1433:1433"
+    build:
+      args:
+        - MSSQL_PWD
+        - MSSQL_UID
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=${MSSQL_PWD}
