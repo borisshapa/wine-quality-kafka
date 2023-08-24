@@ -11,6 +11,7 @@ from src.utils import dao, secrets, common
 def _insert_data_from_csv_to_db(
     sql: dao.MsSql, csv_file: str, group: str, table_name: str
 ):
+    loguru.logger.info("Putting data from {} to {}", csv_file, table_name)
     x, y, _ = common.load_data_from_csv(csv_file, sep=";")
     for x_row, y_row in zip(x, y):
         row = list(x_row) + [y_row, f"'{group}'"]
