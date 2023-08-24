@@ -4,7 +4,7 @@ services:
     build: .
     command: ./sh_scripts/wait_for_it.sh mssql:1433 -t 120 --
          bash -c "python -m scripts.init_db --config_path=configs/init.yml && \
-         python -m scripts.train --config_path=configs/train.yml && \
+         python -m scripts.train --config_path=configs/train_db.yml && \
          python -m scripts.eval --config_path=configs/eval.yml && \
          python -m scripts.clear_db --config_path=configs/clear.yml && \
          coverage run -m src.unit_tests.test_preprocess && \
