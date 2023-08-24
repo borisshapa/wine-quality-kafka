@@ -16,6 +16,7 @@ services:
     image: borisshapa/wine-quality:latest
     depends_on:
       - mssql
+      - kafka
 
   mssql:
     image: mcr.microsoft.com/mssql/server
