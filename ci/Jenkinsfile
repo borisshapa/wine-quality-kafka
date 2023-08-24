@@ -9,6 +9,7 @@ pipeline {
         MSSQL_UID=credentials("mssql-uid")
         MSSQL_PWD=credentials("mssql-pwd")
         MSSQL_DATABASE=credentials("mssql-database")
+        KAFKA_SERVER=credentials("kafka-server")
         LC_ALL = "en_US.UTF-8"
         LANG = "en_US.UTF-8"
         LANGUAGE = "en_US.UTF-8"
@@ -36,7 +37,7 @@ pipeline {
                 dir("wine-quality-kafka") {
                     script{
                         try {
-                            sh "docker compose build --build-arg ANSIBLE_PWD=${ANSIBLE_PWD} --build-arg MSSQL_SERVER=${MSSQL_SERVER} --build-arg MSSQL_UID=${MSSQL_UID} --build-arg MSSQL_PWD=${MSSQL_PWD} --build-arg MSSQL_DATABASE=${MSSQL_DATABASE}"
+                            sh "docker compose build --build-arg ANSIBLE_PWD=${ANSIBLE_PWD} --build-arg MSSQL_SERVER=${MSSQL_SERVER} --build-arg MSSQL_UID=${MSSQL_UID} --build-arg MSSQL_PWD=${MSSQL_PWD} --build-arg MSSQL_DATABASE=${MSSQL_DATABASE} --build-arg KAFKA_SERVER=${KAFKA_SERVER}"
                         } finally {
                             sh "docker compose up"
                         }

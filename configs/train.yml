@@ -1,8 +1,8 @@
 seed: 21
 
-data:
-  train_data: data/train.csv
-  val_data: data/val.csv
+#data:
+#  train_data: data/train.csv
+#  val_data: data/val.csv
 
 model:
   n_estimators: 100
