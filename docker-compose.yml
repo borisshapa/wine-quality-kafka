@@ -2,8 +2,8 @@ version: "3.10"
 services:
   web:
     build: .
-#    ./sh_scripts/wait_for_it.sh -t 60 mssql:1433 --
-    command: bash -c "sleep 15s && python -m scripts.init_db --config_path=configs/init.yml && \
+    command: ./sh_scripts/wait_for_it.sh -t 60 mssql:1433 --
+         bash -c "python -m scripts.init_db --config_path=configs/init.yml && \
          python -m scripts.train --config_path=configs/train_db.yml && \
          python -m scripts.eval --config_path=configs/eval.yml && \
          python -m scripts.clear_db --config_path=configs/clear.yml && \
