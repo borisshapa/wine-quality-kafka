@@ -24,12 +24,12 @@ pipeline {
         stage("Clone github repository") {
             steps {
                 cleanWs()
-                sh "git clone -b master https://github.com/borisshapa/wine-quality-kafka"
+                bash "git clone -b ${GIT_BRANCH:-master} https://github.com/borisshapa/wine-quality-kafka"
             }
         }
         stage("Login") {
             steps {
-                sh "docker login -u $DOCKERHUB_CREDS_USR -p $DOCKERHUB_CREDS_PSW"
+                bash "docker login -u $DOCKERHUB_CREDS_USR -p $DOCKERHUB_CREDS_PSW"
             }
         }
         stage("Build and run docker container") {
@@ -37,9 +37,9 @@ pipeline {
                 dir("wine-quality-kafka") {
                     script{
                         try {
-                            sh "docker compose build --build-arg ANSIBLE_PWD=${ANSIBLE_PWD} --build-arg MSSQL_SERVER=${MSSQL_SERVER} --build-arg MSSQL_UID=${MSSQL_UID} --build-arg MSSQL_PWD=${MSSQL_PWD} --build-arg MSSQL_DATABASE=${MSSQL_DATABASE} --build-arg KAFKA_SERVER=${KAFKA_SERVER}"
+                            bash "docker compose build --build-arg ANSIBLE_PWD=${ANSIBLE_PWD} --build-arg MSSQL_SERVER=${MSSQL_SERVER} --build-arg MSSQL_UID=${MSSQL_UID} --build-arg MSSQL_PWD=${MSSQL_PWD} --build-arg MSSQL_DATABASE=${MSSQL_DATABASE} --build-arg KAFKA_SERVER=${KAFKA_SERVER}"
                         } finally {
-                            sh "docker compose up -d"
+                            bash "docker compose up -d"
                         }
                     }
                 }
@@ -49,17 +49,17 @@ pipeline {
             steps {
                 dir("wine-quality-kafka") {
                     script {
-                        sh "docker compose logs -t --tail 10 web"
+                        bash "docker compose logs -t --tail 10 web"
                         try {
                             timeout(10) {
-                                sh "docker compose up -d"
+                                bash "docker compose up -d"
                                 waitUntil {
                                     "exited" == sh(returnStdout: true,
                                     script: "docker inspect wine-quality-kafka-web-1 --format=\"{{ .State.Status }}\"").trim()
                                 }
                             }
                         } finally {
-                            sh "docker compose logs -t --tail 10"
+                            bash "docker compose logs -t --tail 10"
                         }
                     }
                 }
@@ -67,13 +67,13 @@ pipeline {
         }
         stage("Push") {
             steps {
-                sh "docker push borisshapa/wine-quality:latest"
+                bash "docker push borisshapa/wine-quality:latest"
             }
         }
     }
     post {
         always {
-            sh "docker logout"
+            bash "docker logout"
         }
     }
 }
