@@ -24,7 +24,7 @@ pipeline {
         stage("Clone github repository") {
             steps {
                 cleanWs()
-                sh "git clone -b ${GIT_BRANCH:-master} https://github.com/borisshapa/wine-quality-kafka"
+                sh "git clone -b master https://github.com/borisshapa/wine-quality-kafka"
             }
         }
         stage("Login") {
