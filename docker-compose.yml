@@ -2,7 +2,7 @@ version: "3.10"
 services:
   web:
     build: .
-    command: ./sh_scripts/wait_for_it.sh -t 60 mssql:1433 --
+    command: ./sh_scripts/wait_for_it.sh -t 90 mssql:1433 -- 
          bash -c "python -m scripts.init_db --config_path=configs/init.yml && \
          python -m scripts.train --config_path=configs/train_db.yml && \
          python -m scripts.eval --config_path=configs/eval.yml && \
@@ -21,6 +21,7 @@ services:
     image: mcr.microsoft.com/mssql/server
     ports:
       - "1433:1433"
+    user: root
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=${MSSQL_PWD}
