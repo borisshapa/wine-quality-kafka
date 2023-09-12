@@ -14,7 +14,7 @@ A service for determining the quality of wine by its numerical parameters.
 * `src` ‒ source code of the function used by scripts, also contains unit test of its functions;
 * `tests` ‒ functional tests;
 
-## Instalation
+## Installation
 Local installation via pip:
 ```shell
 git clone https://github.com/borisshapa/wine-quality
